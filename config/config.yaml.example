@@ -1,0 +1,14 @@
+# config.yaml.example
+# Copie ce fichier en config.yaml et remplis avec tes vraies valeurs
+# config.yaml est ignoré par git
+
+network:
+  pc_ip: "0.0.0.0"
+  port: 2005
+
+robot:
+  robot_ip: "192.168.X.X"
+  send_freq: 0.004
+
+simulator:
+  sim_ip: "127.0.0.1"

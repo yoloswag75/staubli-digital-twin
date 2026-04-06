@@ -48,3 +48,4 @@ config_local.py
 # ── Archives ─────────────────────────────────────────────────
 *.zip
 *.tar.gz
+config/config.yaml
