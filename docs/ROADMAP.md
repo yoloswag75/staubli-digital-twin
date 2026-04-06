@@ -2,7 +2,7 @@
 
 ---
 
-## Phase 1 — Communication TCP bidirectionnelle ✅ EN COURS
+## Phase 1 — Communication TCP bidirectionnelle ✅ TERMINÉE
 
 **Objectif :** établir et valider la communication entre le robot et ROS2.
 
@@ -13,23 +13,30 @@
 - [x] Socket bidirectionnel sur port 2005
 
 ### ROS2 (PC)
-- [ ] Créer le workspace `ros2_ws`
-- [ ] Créer `staubli_msgs` avec les messages custom
-- [ ] Créer `staubli_bridge` avec le bridge TCP
-- [ ] Build et test de publication `/joint_states`
+- [x] Créer le workspace `ros2_ws`
+- [x] Créer `staubli_msgs` avec les messages custom
+- [x] Créer `staubli_bridge` avec le bridge TCP
+- [x] Build et test de publication `/joint_states`
+
+### Résultats validés
+- [x] Fréquence stable ~240 Hz (min 4ms, max 5ms, std dev 0.2ms)
+- [x] Topics `/joint_states`, `/staubli/tcp_pose`, `/staubli/joint_cmd` actifs
+- [x] Envoi commande PC → robot fonctionnel
+- [x] Simulateur `tools/robot_simulator.py` validé en remplacement de SRS
 
 ---
 
-## Phase 2 — Test avec SRS (simulateur Stäubli)
+## Phase 2 — Test avec le vrai robot 🔄 EN COURS
 
-**Objectif :** valider la communication sans le vrai robot.
+**Objectif :** valider sur le matériel réel (Stäubli RX160L / CS8).
 
-- [ ] Ouvrir le projet `numericalTwins` dans SRS
-- [ ] Configurer `init.pgx` avec `target = "127.0.0.1"`
-- [ ] Lancer `staubli_bridge` côté PC
-- [ ] Vérifier la réception des trames position dans ROS2
-- [ ] Tester l'envoi de commandes depuis ROS2 → SRS
-- [ ] Visualiser le robot dans RViz avec l'URDF Stäubli
+- [ ] Configurer `init.pgx` avec `target = "192.168.0.3"`
+- [ ] Vérifier la connectivité réseau robot ↔ PC
+- [ ] Déployer le projet VAL3 `numericalTwins` sur le CS8
+- [ ] Valider la réception des trames position dans ROS2
+- [ ] Tester l'envoi de commandes depuis ROS2 → robot réel
+- [ ] Vérifier la détection d'overrun (`nOvrPos`)
+- [ ] Visualiser le robot dans RViz avec l'URDF Stäubli RX160L
 
 ---
 
