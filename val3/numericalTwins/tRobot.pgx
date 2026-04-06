@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="tRobot">
+    <Code><![CDATA[begin
+  resetMotion(jStart)
+
+  while !bFinish
+    // Attente d'une nouvelle commande de tCommande
+    wait(bNewCmd == true)
+
+    // Vérification de la continuité des trames
+    if nCmdIndex == nLastIndex + 1
+      movej(jCmd, flange, mNomSpeed)
+      nLastIndex = nCmdIndex
+      bNewCmd = false  // Libère tCommande pour la prochaine commande
+    else
+      logMsg("Erreur trame commande, attendue: " + toString("", nLastIndex + 1) + " recue: " + toString("", nCmdIndex))
+      // On resynchronise sur l'index reçu pour ne pas bloquer indéfiniment
+      nLastIndex = nCmdIndex - 1
+    endIf
+
+    delay(0)
+  endWhile
+
+  waitEndMove()
+end]]></Code>
+  </Program>
+</Programs>

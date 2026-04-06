@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="start">
+    <Code><![CDATA[begin
+  // ── Initialisation ───────────────────────────────────────
+  call init()
+
+  // ── tPosition : envoi position toutes les 4ms (sync) ────
+  taskCreateSync sTaskPos, 0.004, bOvrPosition, tPosition()
+  wait(taskStatus(sTaskPos) == 1)
+
+  // ── tCommande : réception des commandes joints ───────────
+  taskCreate sTaskCmd, 100, tCommande()
+  wait(taskStatus(sTaskCmd) == 1)
+
+  // ── tRobot : exécution des mouvements ────────────────────
+  taskCreate sTaskRobot, 100, tRobot()
+  wait(taskStatus(sTaskRobot) == 1)
+
+  // ── Boucle de surveillance des overruns ──────────────────
+  while true
+    if nPrevOvrPos != nOvrPos
+      logMsg("Overrun dans la tache " + sTaskPos)
+      nPrevOvrPos = nOvrPos
+    endIf
+    delay(0)
+  endWhile
+end]]></Code>
+  </Program>
+</Programs>

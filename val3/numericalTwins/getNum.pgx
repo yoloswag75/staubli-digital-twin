@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="getNum">
+    <Parameters xmlns="http://www.staubli.com/robotics/VAL3/Param/1">
+      <Parameter name="x_nNum" type="num" xsi:type="element" use="reference" />
+      <Parameter name="x_nEnd" type="num" xsi:type="element" />
+    </Parameters>
+    <Code><![CDATA[begin
+  sDataIn = ""
+  do
+    nNbChar = sioGet(sioSocket, nData)
+    if nNbChar > 0 and nData != x_nEnd
+      sDataIn = sDataIn + chr(nData)
+    endIf
+  until nNbChar > 0 and nData == x_nEnd
+  sDataIn = toNum(sDataIn, x_nNum, bResult)
+end]]></Code>
+  </Program>
+</Programs>

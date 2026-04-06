@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="tPosition">
+    <Locals>
+      <Local name="l_nIndex" type="num" xsi:type="array" size="1" />
+    </Locals>
+    <Code><![CDATA[begin
+  // Trame envoyée au PC :
+  // {index;j1;j2;j3;j4;j5;j6;x;y;z;rx;ry;rz}
+  // Une seule paire d'accolades, 13 champs séparés par ";"
+
+  while true
+    delay(0)
+
+    nFrameIndex = nFrameIndex + 1
+
+    // Position articulaire courante
+    jHere = herej()
+    // Position cartésienne courante (outil torche dans repère world)
+    pHere = here(torche, world)
+
+    // Construction de la trame (128 caractères max)
+    sData = "{"
+    sData = sData + toString("",    nFrameIndex)    + ";"
+    sData = sData + toString("10.3", jHere.j1)      + ";"
+    sData = sData + toString("10.3", jHere.j2)      + ";"
+    sData = sData + toString("10.3", jHere.j3)      + ";"
+    sData = sData + toString("10.3", jHere.j4)      + ";"
+    sData = sData + toString("10.3", jHere.j5)      + ";"
+    sData = sData + toString("10.3", jHere.j6)      + ";"  // ← corrigé : ";" et non "}"
+    sData = sData + toString(".3",   pHere.trsf.x)  + ";"
+    sData = sData + toString(".3",   pHere.trsf.y)  + ";"
+    sData = sData + toString(".3",   pHere.trsf.z)  + ";"
+    sData = sData + toString(".3",   pHere.trsf.rx) + ";"
+    sData = sData + toString(".3",   pHere.trsf.ry) + ";"
+    sData = sData + toString(".3",   pHere.trsf.rz) + "}"  // ← seul "}" de fin de trame
+
+    // Envoi octet par octet
+    for l_nIndex = 0 to len(sData) - 1
+      sioSet(sioSocket, asc(sData, l_nIndex))
+    endFor
+    // Fin de trame LF
+    sioSet(sioSocket, nEol)
+
+    // Détection overrun
+    if bOvrPosition
+      nOvrPos = nOvrPos + 1
+    endIf
+  endWhile
+end]]></Code>
+  </Program>
+</Programs>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="init">
+    <Code><![CDATA[begin
+  // ── Noms des tâches ──────────────────────────────────────
+  sTaskPos   = "tPosition"
+  sTaskCmd   = "tCommande"
+  sTaskRobot = "tRobot"
+
+  // ── Overrun ──────────────────────────────────────────────
+  bOvrPosition = false
+  nOvrPos      = 0
+  nPrevOvrPos  = 0
+
+  // ── Index trames émises ──────────────────────────────────
+  nFrameIndex = 0
+
+  // ── Caractères de protocole ──────────────────────────────
+  nEol     = 10           // LF  (fin de trame)
+  nSof     = asc("{", 0)  // 123 (début de trame commande)
+  nEof     = asc("}", 0)  // 125 (fin de trame commande)
+  nDivider = asc(";", 0)  // 59  (séparateur)
+
+  // ── Flags producteur / consommateur ─────────────────────
+  bNewCmd   = false
+  bFinish   = false
+  nLastIndex = -1  // La 1ère commande attendue sera l'index 0
+
+  // ── Configuration socket TCP (bidirectionnel) ────────────
+  // Le robot est CLIENT, le PC est SERVEUR
+  sioCtrl(sioSocket, "port",        2005)
+  sioCtrl(sioSocket, "target",      "192.168.0.3")
+  sioCtrl(sioSocket, "endOfString", nEol)
+  sioCtrl(sioSocket, "timeout",     -1)
+  sioCtrl(sioSocket, "nagle",       false)
+end]]></Code>
+  </Program>
+</Programs>

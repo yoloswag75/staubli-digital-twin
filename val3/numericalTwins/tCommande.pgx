@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="tCommande">
+    <Code><![CDATA[begin
+  // Trame attendue depuis le PC :
+  // {index;j1;j2;j3;j4;j5;j6}
+  // Même format que giveMeTraj
+
+  while true
+    // Attente que tRobot ait consommé la commande précédente
+    wait(bNewCmd == false)
+
+    // Recherche du début de trame '{'
+    do
+      nNbChar = sioGet(sioSocket, nData)
+    until nNbChar > 0 and nData == nSof
+
+    // Lecture des 7 champs
+    call getNum(nCmdIndex, nDivider)  // index
+    call getNum(jCmd.j1,   nDivider)  // axe 1
+    call getNum(jCmd.j2,   nDivider)  // axe 2
+    call getNum(jCmd.j3,   nDivider)  // axe 3
+    call getNum(jCmd.j4,   nDivider)  // axe 4
+    call getNum(jCmd.j5,   nDivider)  // axe 5
+    call getNum(jCmd.j6,   nEof)      // axe 6, terminé par '}'
+
+    // Signal : nouvelle commande disponible pour tRobot
+    bNewCmd = true
+
+    delay(0)
+  endWhile
+end]]></Code>
+  </Program>
+</Programs>

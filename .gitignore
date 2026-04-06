@@ -1,0 +1,50 @@
+# ── ROS2 / Colcon ────────────────────────────────────────────
+build/
+install/
+log/
+.colcon_install_layout
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+.eggs/
+dist/
+*.so
+.Python
+env/
+venv/
+.env
+.venv
+
+# ── Fichiers générés par SRS (Stäubli Robotics Suite) ────────
+*.bak
+*.tmp
+*.log
+*.srs_cache
+
+# ── IDE ──────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Données capteurs / CSV (générés à l'exécution) ───────────
+*.csv
+robot_live_data_*.csv
+
+# ── Secrets / config locale ──────────────────────────────────
+.env.local
+config_local.py
+
+# ── Archives ─────────────────────────────────────────────────
+*.zip
+*.tar.gz

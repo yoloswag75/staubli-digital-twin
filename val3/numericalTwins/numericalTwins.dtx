@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Data/2">
+  <Datas>
+    <!-- Vitesse nominale pour movej -->
+    <Data name="mNomSpeed" access="private" xsi:type="array" type="mdesc" size="1" />
+
+    <!-- Socket unique bidirectionnel -->
+    <Data name="sioSocket" access="private" xsi:type="array" type="sio" size="1">
+      <Value key="0" link="Socket\toto" />
+    </Data>
+
+    <!-- Noms des tâches -->
+    <Data name="sTaskPos"     access="private" xsi:type="array" type="string" size="1" />
+    <Data name="sTaskCmd"     access="private" xsi:type="array" type="string" size="1" />
+    <Data name="sTaskRobot"   access="private" xsi:type="array" type="string" size="1" />
+
+    <!-- Envoi position (tPosition) -->
+    <Data name="jHere"        access="private" xsi:type="array" type="jointRx" size="1" />
+    <Data name="sData"        access="private" xsi:type="array" type="string"  size="1" />
+    <Data name="nFrameIndex"  access="private" xsi:type="array" type="num"     size="1" />
+    <Data name="nEol"         access="private" xsi:type="array" type="num"     size="1" />
+
+    <!-- Overrun de la tâche synchrone -->
+    <Data name="bOvrPosition" access="private" xsi:type="array" type="bool"   size="1" />
+    <Data name="nOvrPos"      access="private" xsi:type="array" type="num"    size="1" />
+    <Data name="nPrevOvrPos"  access="private" xsi:type="array" type="num"    size="1" />
+
+    <!-- Réception commandes (tCommande → tRobot) -->
+    <Data name="nSof"         access="private" xsi:type="array" type="num"     size="1" />
+    <Data name="nEof"         access="private" xsi:type="array" type="num"     size="1" />
+    <Data name="nDivider"     access="private" xsi:type="array" type="num"     size="1" />
+    <Data name="nNbChar"      access="private" xsi:type="array" type="num"     size="1" />
+    <Data name="nData"        access="private" xsi:type="array" type="num"     size="1" />
+    <Data name="sDataIn"      access="private" xsi:type="array" type="string"  size="1" />
+    <Data name="bResult"      access="private" xsi:type="array" type="bool"    size="1" />
+    <Data name="jCmd"         access="private" xsi:type="array" type="jointRx" size="1" />
+    <Data name="nCmdIndex"    access="private" xsi:type="array" type="num"     size="1" />
+    <Data name="nLastIndex"   access="private" xsi:type="array" type="num"     size="1" />
+    <Data name="bNewCmd"      access="private" xsi:type="array" type="bool"    size="1" />
+    <Data name="bFinish"      access="private" xsi:type="array" type="bool"    size="1" />
+    <Data name="jStart"       access="private" xsi:type="array" type="jointRx" size="1" />
+  </Datas>
+</Database>
