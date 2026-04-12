@@ -3,8 +3,10 @@
   <Program name="tCommande">
     <Code><![CDATA[begin
   // Trame attendue depuis le PC :
-  // {index;j1;j2;j3;j4;j5;j6}
-  // Même format que giveMeTraj
+  // {index;type;x;y;z;rx;ry;rz}
+  // type = 0 → movej  (aller au point en optimisant le trajet)
+  // type = 1 → movel  (aller au point en ligne droite)
+  // x, y, z  en mm | rx, ry, rz en degrés | repère world
 
   while true
     // Attente que tRobot ait consommé la commande précédente
@@ -15,14 +17,15 @@
       nNbChar = sioGet(sioSocket, nData)
     until nNbChar > 0 and nData == nSof
 
-    // Lecture des 7 champs
-    call getNum(nCmdIndex, nDivider)  // index
-    call getNum(jCmd.j1,   nDivider)  // axe 1
-    call getNum(jCmd.j2,   nDivider)  // axe 2
-    call getNum(jCmd.j3,   nDivider)  // axe 3
-    call getNum(jCmd.j4,   nDivider)  // axe 4
-    call getNum(jCmd.j5,   nDivider)  // axe 5
-    call getNum(jCmd.j6,   nEof)      // axe 6, terminé par '}'
+    // Lecture des 8 champs
+    call getNum(nCmdIndex,        nDivider)  // index
+    call getNum(nCmdType,         nDivider)  // type (0=movej, 1=movel)
+    call getNum(pCmd.trsf.x,      nDivider)  // X (mm)
+    call getNum(pCmd.trsf.y,      nDivider)  // Y (mm)
+    call getNum(pCmd.trsf.z,      nDivider)  // Z (mm)
+    call getNum(pCmd.trsf.rx,     nDivider)  // RX (degrés)
+    call getNum(pCmd.trsf.ry,     nDivider)  // RY (degrés)
+    call getNum(pCmd.trsf.rz,     nEof)      // RZ (degrés), terminé par '}'
 
     // Signal : nouvelle commande disponible pour tRobot
     bNewCmd = true

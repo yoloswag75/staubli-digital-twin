@@ -10,12 +10,22 @@
 
     // Vérification de la continuité des trames
     if nCmdIndex == nLastIndex + 1
-      movej(jCmd, flange, mNomSpeed)
+
+      // Choix du type de mouvement
+      if nCmdType == 0
+        // movej : VAL3 calcule la cinématique inverse et optimise le trajet
+        movej(pCmd, flange, mNomSpeed)
+      else
+        // movel : mouvement en ligne droite dans l'espace cartésien
+        movel(pCmd, flange, mNomSpeed)
+      endIf
+
       nLastIndex = nCmdIndex
       bNewCmd = false  // Libère tCommande pour la prochaine commande
+
     else
-      logMsg("Erreur trame commande, attendue: " + toString("", nLastIndex + 1) + " recue: " + toString("", nCmdIndex))
-      // On resynchronise sur l'index reçu pour ne pas bloquer indéfiniment
+      logMsg("Erreur trame, attendue: " + toString("", nLastIndex + 1) + " recue: " + toString("", nCmdIndex))
+      // Resynchronisation sur l'index reçu
       nLastIndex = nCmdIndex - 1
     endIf
 

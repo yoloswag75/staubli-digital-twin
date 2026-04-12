@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Data/2">
   <Datas>
-    <!-- Vitesse nominale pour movej -->
+    <!-- Vitesse nominale pour movej/movel -->
     <Data name="mNomSpeed" access="private" xsi:type="array" type="mdesc" size="1" />
 
     <!-- Socket unique bidirectionnel -->
@@ -25,7 +25,7 @@
     <Data name="nOvrPos"      access="private" xsi:type="array" type="num"    size="1" />
     <Data name="nPrevOvrPos"  access="private" xsi:type="array" type="num"    size="1" />
 
-    <!-- Réception commandes (tCommande → tRobot) -->
+    <!-- Réception commandes cartésiennes (tCommande → tRobot) -->
     <Data name="nSof"         access="private" xsi:type="array" type="num"     size="1" />
     <Data name="nEof"         access="private" xsi:type="array" type="num"     size="1" />
     <Data name="nDivider"     access="private" xsi:type="array" type="num"     size="1" />
@@ -33,7 +33,14 @@
     <Data name="nData"        access="private" xsi:type="array" type="num"     size="1" />
     <Data name="sDataIn"      access="private" xsi:type="array" type="string"  size="1" />
     <Data name="bResult"      access="private" xsi:type="array" type="bool"    size="1" />
-    <Data name="jCmd"         access="private" xsi:type="array" type="jointRx" size="1" />
+
+    <!-- Commande cartésienne reçue -->
+    <Data name="pCmd"         access="private" xsi:type="array" type="pointRx" size="1">
+      <Value key="0" fatherId="world[0]" />
+    </Data>
+    <Data name="nCmdType"     access="private" xsi:type="array" type="num"     size="1" />
+    <!-- 0 = movej, 1 = movel -->
+
     <Data name="nCmdIndex"    access="private" xsi:type="array" type="num"     size="1" />
     <Data name="nLastIndex"   access="private" xsi:type="array" type="num"     size="1" />
     <Data name="bNewCmd"      access="private" xsi:type="array" type="bool"    size="1" />
