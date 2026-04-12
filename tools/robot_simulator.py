@@ -7,32 +7,114 @@ Joue le rôle du code VAL3 (tPosition + tCommande) sans avoir SRS.
 
 Comportement :
   - Se connecte au bridge ROS2 (comme le ferait le vrai robot)
-  - Envoie des trames de position toutes les 4ms
-  - Reçoit et affiche les commandes joints envoyées par le PC
-  - Anime les joints avec un mouvement sinusoïdal pour tester RViz
+  - Envoie la position courante toutes les 4ms
+  - Reçoit les commandes cartésiennes {index;type;x;y;z;rx;ry;rz}
+  - Calcule la cinématique inverse (roboticstoolbox) → publie /joint_states
+  - Le robot s'anime dans RViz en suivant la trajectoire
 """
 
 import socket
 import threading
 import time
 import math
+import yaml
+import pathlib
+import numpy as np
+
+# ── CINÉMATIQUE INVERSE ───────────────────────────────────────
+try:
+    import roboticstoolbox as rtb
+    from spatialmath import SE3
+
+    RX160L = rtb.DHRobot([
+        rtb.RevoluteDH(d=0.550, a=0.150,  alpha=-np.pi/2),  # J1
+        rtb.RevoluteDH(d=0,     a=0.825,  alpha=0),          # J2
+        rtb.RevoluteDH(d=0,     a=0,      alpha=-np.pi/2),   # J3
+        rtb.RevoluteDH(d=0.625, a=0,      alpha= np.pi/2),   # J4
+        rtb.RevoluteDH(d=0,     a=0,      alpha=-np.pi/2),   # J5
+        rtb.RevoluteDH(d=0.110, a=0,      alpha=0),          # J6
+    ], name='RX160L')
+
+    IK_AVAILABLE = True
+    print("✅ Cinématique inverse disponible (roboticstoolbox)")
+
+except ImportError:
+    IK_AVAILABLE = False
+    print("⚠️  roboticstoolbox non disponible — joints fixes à la position home")
 
 # ── CONFIGURATION ─────────────────────────────────────────────
-HOST  = "127.0.0.1"   # Le bridge tourne sur la même machine
-PORT  = 2005
-FREQ  = 0.004         # 4ms = 250Hz comme tPosition
+import rclpy
+from rclpy.node import Node
+from sensor_msgs.msg import JointState
+
+def load_config():
+    config_path = pathlib.Path(__file__).parent.parent / 'config' / 'config.yaml'
+    if not config_path.exists():
+        return {"simulator": {"sim_ip": "127.0.0.1"},
+                "network":   {"port": 2005},
+                "robot":     {"send_freq": 0.004}}
+    with open(config_path) as f:
+        return yaml.safe_load(f)
+
+_cfg = load_config()
+HOST = _cfg['simulator']['sim_ip']
+PORT = _cfg['network']['port']
+FREQ = _cfg['robot']['send_freq']
+
+MOVEJ = 0
+MOVEL = 1
+
+# Position home RX160L en radians
+Q_HOME = np.radians([0.0, -30.0, 90.0, 0.0, 45.0, 0.0])
 
 
-class RobotSimulator:
+def ik_solve(x, y, z, rx, ry, rz, q_prev):
+    """
+    Cinématique inverse : (x,y,z mm + rx,ry,rz degrés) → angles joints (degrés)
+    Retourne None si pas de solution.
+    """
+    if not IK_AVAILABLE:
+        return None
+    try:
+        T = SE3(x/1000, y/1000, z/1000) * SE3.RPY(
+            [math.radians(rx), math.radians(ry), math.radians(rz)]
+        )
+        sol = RX160L.ikine_LM(T, q0=np.radians(q_prev))
+        if sol.success:
+            return list(np.degrees(sol.q))
+    except Exception as e:
+        print(f"⚠️  IK échouée : {e}")
+    return None
+
+
+# ── NŒUD ROS2 pour publier /joint_states ─────────────────────
+class JointPublisher(Node):
     def __init__(self):
+        super().__init__('robot_simulator_joints')
+        self.pub = self.create_publisher(JointState, '/joint_states', 10)
+
+    def publish(self, joints_deg):
+        msg = JointState()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.name     = ['joint_1','joint_2','joint_3',
+                        'joint_4','joint_5','joint_6']
+        msg.position = [math.radians(d) for d in joints_deg]
+        self.pub.publish(msg)
+
+
+# ── SIMULATEUR ────────────────────────────────────────────────
+class RobotSimulator:
+    def __init__(self, ros_node: JointPublisher):
         self.frame_index = 0
         self.running     = True
+        self.lock        = threading.Lock()
+        self.ros_node    = ros_node
 
-        # Position articulaire simulée (degrés)
+        # Position articulaire courante (degrés)
         self.joints = [0.0, -30.0, 90.0, 0.0, 45.0, 0.0]
 
-        # Position cartésienne simulée (mm)
-        self.x, self.y, self.z    = 800.0, 0.0, 600.0
+        # Position cartésienne courante (mm + degrés)
+        self.x,  self.y,  self.z  = 800.0, 0.0, 600.0
         self.rx, self.ry, self.rz = 0.0, 90.0, 0.0
 
         # Connexion TCP
@@ -40,38 +122,23 @@ class RobotSimulator:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((HOST, PORT))
         print("✅ Connecté au bridge ROS2 !")
-
-    def animate_joints(self):
-        """Anime les joints avec des sinusoïdes pour simuler un mouvement."""
-        t = time.time()
-        self.joints = [
-            20.0  * math.sin(0.5 * t),           # j1
-            -30.0 + 15.0 * math.sin(0.3 * t),    # j2
-            90.0  + 10.0 * math.cos(0.4 * t),    # j3
-            0.0   + 5.0  * math.sin(0.7 * t),    # j4
-            45.0  + 10.0 * math.cos(0.5 * t),    # j5
-            0.0   + 8.0  * math.sin(0.6 * t),    # j6
-        ]
-        # Position cartésienne qui suit
-        self.x = 800.0 + 50.0 * math.sin(0.3 * t)
-        self.y = 100.0 * math.sin(0.2 * t)
-        self.z = 600.0 + 30.0 * math.cos(0.4 * t)
+        print("📌 Position initiale : home (0, -30, 90, 0, 45, 0)°\n")
 
     def send_loop(self):
         """Envoie la position toutes les 4ms — simule tPosition.pgx."""
         while self.running:
             start = time.time()
-
-            self.animate_joints()
             self.frame_index += 1
 
-            # Format : {index;j1;j2;j3;j4;j5;j6;x;y;z;rx;ry;rz}\n
+            with self.lock:
+                j              = self.joints[:]
+                x, y, z        = self.x, self.y, self.z
+                rx, ry, rz     = self.rx, self.ry, self.rz
+
             trame = "{{{};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f}}}\n".format(
                 self.frame_index,
-                self.joints[0], self.joints[1], self.joints[2],
-                self.joints[3], self.joints[4], self.joints[5],
-                self.x, self.y, self.z,
-                self.rx, self.ry, self.rz
+                j[0], j[1], j[2], j[3], j[4], j[5],
+                x, y, z, rx, ry, rz
             )
 
             try:
@@ -81,18 +148,19 @@ class RobotSimulator:
                 self.running = False
                 break
 
-            # Log toutes les 250 trames (~1 seconde)
             if self.frame_index % 250 == 0:
-                print(f"📡 Trame #{self.frame_index} | j1={self.joints[0]:.1f}° | TCP=({self.x:.0f}, {self.y:.0f}, {self.z:.0f})mm")
+                with self.lock:
+                    print(f"📡 #{self.frame_index} | "
+                          f"TCP=({self.x:.1f}, {self.y:.1f}, {self.z:.1f})mm | "
+                          f"j1={self.joints[0]:.1f}°")
 
-            # Respect de la période 4ms
             elapsed = time.time() - start
             sleep_time = FREQ - elapsed
             if sleep_time > 0:
                 time.sleep(sleep_time)
 
     def recv_loop(self):
-        """Reçoit les commandes joints depuis le PC — simule tCommande.pgx."""
+        """Reçoit les commandes cartésiennes et calcule la cinématique inverse."""
         buffer = ""
         while self.running:
             try:
@@ -107,17 +175,42 @@ class RobotSimulator:
                     line, buffer = buffer.split("\n", 1)
                     line = line.strip()
 
-                    # Format attendu : {index;j1;j2;j3;j4;j5;j6}
                     if line.startswith("{") and line.endswith("}"):
                         content = line[1:-1]
                         parts   = content.split(';')
-                        if len(parts) == 7:
-                            idx  = parts[0]
-                            joints_cmd = [float(p) for p in parts[1:]]
-                            print(f"🎯 Commande reçue #{idx} | j1={joints_cmd[0]:.1f}° j2={joints_cmd[1]:.1f}° j3={joints_cmd[2]:.1f}°...")
-                            # Sur un vrai robot → movej(jCmd, flange, mNomSpeed)
-                            # Ici on met simplement à jour la position simulée
-                            self.joints = joints_cmd
+
+                        # Format : {index;type;x;y;z;rx;ry;rz}
+                        if len(parts) == 8:
+                            idx       = parts[0]
+                            move_type = int(parts[1])
+                            type_str  = "movej" if move_type == MOVEJ else "movel"
+
+                            nx  = float(parts[2])
+                            ny  = float(parts[3])
+                            nz  = float(parts[4])
+                            nrx = float(parts[5])
+                            nry = float(parts[6])
+                            nrz = float(parts[7])
+
+                            # Cinématique inverse
+                            with self.lock:
+                                q_prev = self.joints[:]
+
+                            new_joints = ik_solve(nx, ny, nz, nrx, nry, nrz, q_prev)
+
+                            with self.lock:
+                                self.x,  self.y,  self.z  = nx, ny, nz
+                                self.rx, self.ry, self.rz = nrx, nry, nrz
+                                if new_joints:
+                                    self.joints = new_joints
+
+                            # Publier les joints dans RViz
+                            if new_joints:
+                                self.ros_node.publish(new_joints)
+
+                            print(f"🎯 [{type_str}] #{idx} → "
+                                  f"({nx:.1f}, {ny:.1f}, {nz:.1f})mm "
+                                  f"{'✅' if new_joints else '⚠️ IK échouée'}")
 
             except Exception as e:
                 if self.running:
@@ -125,12 +218,10 @@ class RobotSimulator:
                 break
 
     def run(self):
-        # Thread réception commandes
         t_recv = threading.Thread(target=self.recv_loop, daemon=True)
         t_recv.start()
 
-        print(f"🤖 Simulation démarrée à {1/FREQ:.0f} Hz — Ctrl+C pour arrêter")
-        print(f"📊 Log toutes les secondes\n")
+        print(f"🤖 Simulation démarrée à {1/FREQ:.0f} Hz — Ctrl+C pour arrêter\n")
 
         try:
             self.send_loop()
@@ -141,6 +232,24 @@ class RobotSimulator:
             self.sock.close()
 
 
-if __name__ == '__main__':
-    sim = RobotSimulator()
+# ── MAIN ──────────────────────────────────────────────────────
+def main():
+    rclpy.init()
+    ros_node = JointPublisher()
+
+    # Spin ROS2 dans un thread séparé
+    ros_thread = threading.Thread(
+        target=lambda: rclpy.spin(ros_node),
+        daemon=True
+    )
+    ros_thread.start()
+
+    sim = RobotSimulator(ros_node)
     sim.run()
+
+    ros_node.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
