@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
   <Program name="tRobot">
+    <Locals>
+      <Local name="l_nIdx" type="num" xsi:type="array" size="1" />
+    </Locals>
     <Code><![CDATA[begin
   resetMotion(jStart)
 
   while !bFinish
-    // Attente d'une nouvelle commande de tCommande
-    wait(bNewCmd == true)
+    // Attente qu il y ait au moins un point dans la file
+    wait(nQueueCount > 0)
 
-    // Vérification de la continuité des trames
-    if nCmdIndex == nLastIndex + 1
+    // Lecture du point courant dans la file
+    l_nIdx = nQueueRead
 
-      // Choix du type de mouvement
-      if nCmdType == 0
-        // movej : VAL3 calcule la cinématique inverse et optimise le trajet
-        movej(pCmd, flange, mNomSpeed)
+    // Verification continuite des trames
+    if nIndexQueue[l_nIdx] == nLastIndex + 1
+
+      // Configuration vitesse pour ce point
+      setSpeed(mNomSpeed, nVelQueue[l_nIdx])
+
+      // Execution du mouvement selon le type
+      if nTypeQueue[l_nIdx] == 0
+        movej(pCmdQueue[l_nIdx], flange, mNomSpeed)
       else
-        // movel : mouvement en ligne droite dans l'espace cartésien
-        movel(pCmd, flange, mNomSpeed)
+        movel(pCmdQueue[l_nIdx], flange, mNomSpeed)
       endIf
 
-      nLastIndex = nCmdIndex
-      bNewCmd = false  // Libère tCommande pour la prochaine commande
+      nLastIndex = nIndexQueue[l_nIdx]
+
+      // Envoi ACK + etat file : {ACK;index_execute;n_restant}
+      sAck = "{ACK;" + toString("", nLastIndex) + ";" + toString("", nQueueCount) + "}"
+      nAckIndex = 0
+      while nAckIndex < len(sAck)
+        sioSet(sioSocket, asc(sAck, nAckIndex))
+        nAckIndex = nAckIndex + 1
+      endWhile
+      sioSet(sioSocket, nEol)
 
     else
-      logMsg("Erreur trame, attendue: " + toString("", nLastIndex + 1) + " recue: " + toString("", nCmdIndex))
-      // Resynchronisation sur l'index reçu
-      nLastIndex = nCmdIndex - 1
+      logMsg("Erreur trame, attendue: " + toString("", nLastIndex+1) + " recue: " + toString("", nIndexQueue[l_nIdx]))
+      nLastIndex = nIndexQueue[l_nIdx] - 1
     endIf
+
+    // Avance le pointeur de lecture
+    nQueueRead  = (nQueueRead + 1) mod nQueueSize
+    nQueueCount = nQueueCount - 1
 
     delay(0)
   endWhile

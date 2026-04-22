@@ -9,7 +9,7 @@
       <Value key="0" link="Socket\toto" />
     </Data>
 
-    <!-- Noms des tâches -->
+    <!-- Noms des taches -->
     <Data name="sTaskPos"     access="private" xsi:type="array" type="string" size="1" />
     <Data name="sTaskCmd"     access="private" xsi:type="array" type="string" size="1" />
     <Data name="sTaskRobot"   access="private" xsi:type="array" type="string" size="1" />
@@ -20,12 +20,12 @@
     <Data name="nFrameIndex"  access="private" xsi:type="array" type="num"     size="1" />
     <Data name="nEol"         access="private" xsi:type="array" type="num"     size="1" />
 
-    <!-- Overrun de la tâche synchrone -->
+    <!-- Overrun de la tache synchrone -->
     <Data name="bOvrPosition" access="private" xsi:type="array" type="bool"   size="1" />
     <Data name="nOvrPos"      access="private" xsi:type="array" type="num"    size="1" />
     <Data name="nPrevOvrPos"  access="private" xsi:type="array" type="num"    size="1" />
 
-    <!-- Réception commandes cartésiennes (tCommande → tRobot) -->
+    <!-- Protocole socket -->
     <Data name="nSof"         access="private" xsi:type="array" type="num"     size="1" />
     <Data name="nEof"         access="private" xsi:type="array" type="num"     size="1" />
     <Data name="nDivider"     access="private" xsi:type="array" type="num"     size="1" />
@@ -34,17 +34,41 @@
     <Data name="sDataIn"      access="private" xsi:type="array" type="string"  size="1" />
     <Data name="bResult"      access="private" xsi:type="array" type="bool"    size="1" />
 
-    <!-- Commande cartésienne reçue -->
-    <Data name="pCmd"         access="private" xsi:type="array" type="pointRx" size="1">
+    <!-- File de commandes (taille 5) -->
+    <Data name="pCmdQueue"    access="private" xsi:type="array" type="pointRx" size="5">
       <Value key="0" fatherId="world[0]" />
+      <Value key="1" fatherId="world[0]" />
+      <Value key="2" fatherId="world[0]" />
+      <Value key="3" fatherId="world[0]" />
+      <Value key="4" fatherId="world[0]" />
     </Data>
-    <Data name="nCmdType"     access="private" xsi:type="array" type="num"     size="1" />
-    <!-- 0 = movej, 1 = movel -->
+    <Data name="nTypeQueue"   access="private" xsi:type="array" type="num"     size="5" />
+    <!-- type : 0=movej, 1=movel -->
+    <Data name="nIndexQueue"  access="private" xsi:type="array" type="num"     size="5" />
+    <!-- index de chaque point dans la file -->
+    <Data name="nVelQueue"    access="private" xsi:type="array" type="num"     size="5" />
+    <!-- vitesse mm/s de chaque point -->
 
+    <!-- Pointeurs de file (producteur/consommateur) -->
+    <Data name="nQueueWrite"  access="private" xsi:type="array" type="num"     size="1" />
+    <!-- index d ecriture (tCommande) -->
+    <Data name="nQueueRead"   access="private" xsi:type="array" type="num"     size="1" />
+    <!-- index de lecture (tRobot) -->
+    <Data name="nQueueCount"  access="private" xsi:type="array" type="num"     size="1" />
+    <!-- nombre de points dans la file -->
+    <Data name="nQueueSize"   access="private" xsi:type="array" type="num"     size="1" />
+    <!-- taille max de la file (5) -->
+
+    <!-- Variables de parsing -->
     <Data name="nCmdIndex"    access="private" xsi:type="array" type="num"     size="1" />
+    <Data name="nCmdType"     access="private" xsi:type="array" type="num"     size="1" />
+    <Data name="nCmdVel"      access="private" xsi:type="array" type="num"     size="1" />
     <Data name="nLastIndex"   access="private" xsi:type="array" type="num"     size="1" />
-    <Data name="bNewCmd"      access="private" xsi:type="array" type="bool"    size="1" />
     <Data name="bFinish"      access="private" xsi:type="array" type="bool"    size="1" />
     <Data name="jStart"       access="private" xsi:type="array" type="jointRx" size="1" />
+
+    <!-- ACK envoye par tRobot apres execution -->
+    <Data name="sAck"         access="private" xsi:type="array" type="string"  size="1" />
+    <Data name="nAckIndex"    access="private" xsi:type="array" type="num"     size="1" />
   </Datas>
 </Database>

@@ -52,6 +52,7 @@ class StaubliBridgeROS2(Node):
         # ── Publieurs ─────────────────────────────────────────
         self.pub_joints = self.create_publisher(JointState,  '/joint_states',     10)
         self.pub_pose   = self.create_publisher(PoseStamped, '/staubli/tcp_pose', 10)
+        self.pub_ack    = self.create_publisher(JointState,  '/staubli/cmd_ack',  10)
 
         # ── Subscribers ───────────────────────────────────────
         # Commandes articulaires (joints en radians)
@@ -101,6 +102,7 @@ class StaubliBridgeROS2(Node):
                     if not data:
                         self.get_logger().warn("🔌 Connexion coupée par le robot.")
                         break
+                    self.get_logger().info(f"TCP recu: {repr(data[:100])}")
                     buffer += data
                     while "\n" in buffer:
                         line, buffer = buffer.split("\n", 1)
@@ -108,6 +110,19 @@ class StaubliBridgeROS2(Node):
                         if line.startswith("{") and line.endswith("}"):
                             content = line[1:-1]
                             parts   = content.split(';')
+                            # Trame ACK : {ACK;index;n_restant}
+                            if len(parts) >= 2 and parts[0] == 'ACK':
+                                try:
+                                    ack_index  = int(parts[1])
+                                    n_restant  = int(parts[2]) if len(parts) > 2 else -1
+                                    ack_msg = JointState()
+                                    ack_msg.header.stamp    = self.get_clock().now().to_msg()
+                                    ack_msg.header.frame_id = f"{ack_index};{n_restant}"
+                                    self.pub_ack.publish(ack_msg)
+                                    self.get_logger().info(f"ACK recu #{ack_index} | file: {n_restant} restants")
+                                except ValueError:
+                                    pass
+
                             if len(parts) == 13:
                                 writer.writerow([time.time()] + parts)
                                 file.flush()
@@ -154,11 +169,13 @@ class StaubliBridgeROS2(Node):
                 joints_deg[3], joints_deg[4], joints_deg[5]
             )
             self._send(trame)
+            self.get_logger().info(f"Trame envoyee au robot: {trame}")
 
     # ──────────────────────────────────────────────────────────
     # ENVOI CARTÉSIEN : /staubli/cart_cmd → Robot
     # ──────────────────────────────────────────────────────────
     def cart_cmd_callback(self, msg: PoseStamped):
+        self.get_logger().info(f"cart_cmd recu: {msg.header.frame_id}")
         """
         Commande cartésienne depuis dtx_player.py.
         Le type (movej/movel) est encodé dans frame_id :
@@ -167,6 +184,10 @@ class StaubliBridgeROS2(Node):
         """
         # Décodage du type depuis le frame_id
         move_type = MOVEJ if 'movej' in msg.header.frame_id else MOVEL
+        try:
+            vel = float(msg.header.frame_id.split('_')[-1])
+        except (ValueError, IndexError):
+            vel = 50.0
 
         # Conversion m → mm (VAL3 travaille en mm)
         x  = msg.pose.position.x * 1000.0
@@ -186,15 +207,12 @@ class StaubliBridgeROS2(Node):
 
         with self.send_lock:
             self.send_index += 1
-            trame = "{{{};{};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f}}}".format(
+            trame = "{{{};{};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f};{:.3f}}}".format(
                 self.send_index, move_type,
-                x, y, z, rx, ry, rz
+                x, y, z, rx, ry, rz, vel
             )
             self._send(trame)
-            self.get_logger().debug(
-                f"→ Robot ({'movej' if move_type == MOVEJ else 'movel'}) : "
-                f"x={x:.1f} y={y:.1f} z={z:.1f}"
-            )
+            self.get_logger().info(f"Trame envoyee au robot: {trame}")
 
     # ──────────────────────────────────────────────────────────
     # UTILITAIRES

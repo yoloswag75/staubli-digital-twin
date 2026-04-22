@@ -3,32 +3,38 @@
   <Program name="tCommande">
     <Code><![CDATA[begin
   // Trame attendue depuis le PC :
-  // {index;type;x;y;z;rx;ry;rz}
-  // type = 0 → movej  (aller au point en optimisant le trajet)
-  // type = 1 → movel  (aller au point en ligne droite)
-  // x, y, z  en mm | rx, ry, rz en degrés | repère world
+  // {index;type;x;y;z;rx;ry;rz;vel}
+  // type : 0=movej, 1=movel
+  // vel  : vitesse TCP mm/s
 
   while true
-    // Attente que tRobot ait consommé la commande précédente
-    wait(bNewCmd == false)
+    // Attente que la file ne soit pas pleine
+    wait(nQueueCount < nQueueSize)
 
-    // Recherche du début de trame '{'
+    // Recherche debut de trame
     do
       nNbChar = sioGet(sioSocket, nData)
     until nNbChar > 0 and nData == nSof
 
-    // Lecture des 8 champs
-    call getNum(nCmdIndex,        nDivider)  // index
-    call getNum(nCmdType,         nDivider)  // type (0=movej, 1=movel)
-    call getNum(pCmd.trsf.x,      nDivider)  // X (mm)
-    call getNum(pCmd.trsf.y,      nDivider)  // Y (mm)
-    call getNum(pCmd.trsf.z,      nDivider)  // Z (mm)
-    call getNum(pCmd.trsf.rx,     nDivider)  // RX (degrés)
-    call getNum(pCmd.trsf.ry,     nDivider)  // RY (degrés)
-    call getNum(pCmd.trsf.rz,     nEof)      // RZ (degrés), terminé par '}'
+    // Lecture des 9 champs
+    call getNum(nCmdIndex,                       nDivider)
+    call getNum(nCmdType,                        nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.x,   nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.y,   nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.z,   nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.rx,  nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.ry,  nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.rz,  nDivider)
+    call getNum(nCmdVel,                         nEof)
 
-    // Signal : nouvelle commande disponible pour tRobot
-    bNewCmd = true
+    // Ecriture dans la file
+    nTypeQueue[nQueueWrite]  = nCmdType
+    nIndexQueue[nQueueWrite] = nCmdIndex
+    nVelQueue[nQueueWrite]   = nCmdVel
+
+    // Avance le pointeur d ecriture (circulaire)
+    nQueueWrite = (nQueueWrite + 1) mod nQueueSize
+    nQueueCount = nQueueCount + 1
 
     delay(0)
   endWhile

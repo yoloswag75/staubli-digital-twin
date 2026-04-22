@@ -222,7 +222,7 @@ def main():
     print(f"✅ {len(points)} points chargés")
 
     rclpy.init()
-    node = DtxPlayer(points, args.speed, args.dry_run)
+    node = DtxPlayer(points, args.vel, args.dry_run)
     try:
         rclpy.spin(node)
     except SystemExit:

@@ -180,7 +180,7 @@ class RobotSimulator:
                         parts   = content.split(';')
 
                         # Format : {index;type;x;y;z;rx;ry;rz}
-                        if len(parts) == 8:
+                        if len(parts) == 9:
                             idx       = parts[0]
                             move_type = int(parts[1])
                             type_str  = "movej" if move_type == MOVEJ else "movel"
@@ -191,6 +191,7 @@ class RobotSimulator:
                             nrx = float(parts[5])
                             nry = float(parts[6])
                             nrz = float(parts[7])
+                            vel = float(parts[8])  # vitesse mm/s
 
                             # Cinématique inverse
                             with self.lock:
@@ -210,7 +211,18 @@ class RobotSimulator:
 
                             print(f"🎯 [{type_str}] #{idx} → "
                                   f"({nx:.1f}, {ny:.1f}, {nz:.1f})mm "
+                                  f"vel={vel:.0f}mm/s "
                                   f"{'✅' if new_joints else '⚠️ IK échouée'}")
+
+                            # Envoi ACK : {ACK;index;n_restant}
+                            import time as _t
+                            _t.sleep(0.01)
+                            ack = "{ACK;" + str(idx) + ";0}\n"
+                            try:
+                                self.sock.sendall(ack.encode('ascii'))
+                                print(f"📤 ACK envoyé #{idx}")
+                            except Exception as e:
+                                print(f"❌ ACK erreur : {e}")
 
             except Exception as e:
                 if self.running:
