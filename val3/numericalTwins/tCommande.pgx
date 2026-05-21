@@ -33,7 +33,10 @@
     nVelQueue[nQueueWrite]   = nCmdVel
 
     // Avance le pointeur d ecriture (circulaire)
-    nQueueWrite = (nQueueWrite + 1) mod nQueueSize
+    nQueueWrite = nQueueWrite + 1
+    if nQueueWrite >= nQueueSize
+      nQueueWrite = 0
+    endIf
     nQueueCount = nQueueCount + 1
 
     delay(0)

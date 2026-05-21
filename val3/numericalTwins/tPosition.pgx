@@ -16,8 +16,8 @@
 
     // Position articulaire courante
     jHere = herej()
-    // Position cartésienne courante (outil torche dans repère world)
-    pHere = here(torche, world)
+    // Position cartesienne courante
+    pHere = here(flange, world)
 
     // Construction de la trame (128 caractères max)
     sData = "{"
@@ -27,13 +27,13 @@
     sData = sData + toString("10.3", jHere.j3)      + ";"
     sData = sData + toString("10.3", jHere.j4)      + ";"
     sData = sData + toString("10.3", jHere.j5)      + ";"
-    sData = sData + toString("10.3", jHere.j6)      + ";"  // ← corrigé : ";" et non "}"
+    sData = sData + toString("10.3", jHere.j6)      + ";"  
     sData = sData + toString(".3",   pHere.trsf.x)  + ";"
     sData = sData + toString(".3",   pHere.trsf.y)  + ";"
     sData = sData + toString(".3",   pHere.trsf.z)  + ";"
     sData = sData + toString(".3",   pHere.trsf.rx) + ";"
     sData = sData + toString(".3",   pHere.trsf.ry) + ";"
-    sData = sData + toString(".3",   pHere.trsf.rz) + "}"  // ← seul "}" de fin de trame
+    sData = sData + toString(".3",   pHere.trsf.rz) + "}"  
 
     // Envoi octet par octet
     for l_nIndex = 0 to len(sData) - 1

@@ -18,7 +18,7 @@
     if nIndexQueue[l_nIdx] == nLastIndex + 1
 
       // Configuration vitesse pour ce point
-      setSpeed(mNomSpeed, nVelQueue[l_nIdx])
+      mNomSpeed.vel = nVelQueue[l_nIdx]
 
       // Execution du mouvement selon le type
       if nTypeQueue[l_nIdx] == 0
@@ -45,7 +45,10 @@
     endIf
 
     // Avance le pointeur de lecture
-    nQueueRead  = (nQueueRead + 1) mod nQueueSize
+    nQueueRead = nQueueRead + 1
+    if nQueueRead >= nQueueSize
+      nQueueRead = 0
+    endIf
     nQueueCount = nQueueCount - 1
 
     delay(0)
