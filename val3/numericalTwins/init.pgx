@@ -29,7 +29,7 @@
 
   // Flags
   bFinish    = false
-  nLastIndex = -1
+  nLastIndex = 0
 
   // Socket TCP
   sioCtrl(sioSocket, "port",        2005)

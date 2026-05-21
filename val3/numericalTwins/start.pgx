@@ -6,7 +6,7 @@
   call init()
 
   // ── tPosition : envoi position toutes les 4ms (sync) ────
-  taskCreateSync sTaskPos, 0.004, bOvrPosition, tPosition()
+  taskCreateSync sTaskPos, 0.040, bOvrPosition, tPosition()
   wait(taskStatus(sTaskPos) == 1)
 
   // ── tCommande : réception des commandes joints ───────────

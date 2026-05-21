@@ -26,6 +26,7 @@
       else
         movel(pCmdQueue[l_nIdx], flange, mNomSpeed)
       endIf
+      waitEndMove()
 
       nLastIndex = nIndexQueue[l_nIdx]
 
