@@ -31,6 +31,13 @@
   bFinish    = false
   nLastIndex = 0
 
+  // Initialisation file avec repere world
+  pCmdQueue[0] = here(flange, world)
+  pCmdQueue[1] = here(flange, world)
+  pCmdQueue[2] = here(flange, world)
+  pCmdQueue[3] = here(flange, world)
+  pCmdQueue[4] = here(flange, world)
+
   // Socket TCP
   sioCtrl(sioSocket, "port",        2005)
   sioCtrl(sioSocket, "target",      "192.168.0.3")
