@@ -31,6 +31,13 @@
   bFinish    = false
   nLastIndex = 0
 
+  // Initialisation vitesse nominale
+  mNomSpeed.vel   = 50
+  mNomSpeed.accel = 50
+  mNomSpeed.dec   = 50
+  mNomSpeed.tmax  = 999
+  mNomSpeed.rmax  = 9999
+
   // Initialisation file avec repere world
   pCmdQueue[0] = here(flange, world)
   pCmdQueue[1] = here(flange, world)
@@ -40,7 +47,7 @@
 
   // Socket TCP
   sioCtrl(sioSocket, "port",        2005)
-  sioCtrl(sioSocket, "target",      "192.168.0.3")
+  sioCtrl(sioSocket, "target",      "192.168.99.6")
   sioCtrl(sioSocket, "endOfString", nEol)
   sioCtrl(sioSocket, "timeout",     -1)
   sioCtrl(sioSocket, "nagle",       false)

@@ -19,6 +19,10 @@
 
       // Configuration vitesse pour ce point
       mNomSpeed.vel = nVelQueue[l_nIdx]
+      pCmdQueue[l_nIdx].config.shoulder = lefty
+      pCmdQueue[l_nIdx].config.wrist    = wpositive
+      pCmdQueue[l_nIdx].config.elbow    = epositive
+      logMsg("Point: x=" + toString(".1", pCmdQueue[l_nIdx].trsf.x) + " y=" + toString(".1", pCmdQueue[l_nIdx].trsf.y) + " z=" + toString(".1", pCmdQueue[l_nIdx].trsf.z))
 
       // Execution du mouvement selon le type
       if nTypeQueue[l_nIdx] == 0
