@@ -1,30 +1,59 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
-  <Program name="start">
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2" >
+  <Program name="start" access="private" >
     <Code><![CDATA[begin
   // Initialisation
   call init()
 
   // tPosition : envoi position toutes les 40ms (sync)
-  taskCreateSync sTaskPos, 0.040, bOvrPosition, tPosition()
-  wait(taskStatus(sTaskPos) == 1)
+  taskCreateSync sTaskPos,0.04,bOvrPosition,tPosition()
+  wait(taskStatus(sTaskPos)==1)
+
+  // Mouvement vers le point de test avec l'outil Buse
+  movej(home,tBuse,vitextrusion)
+  waitEndMove()
+
+  // D├⌐finition du point de d├⌐gagement et d'accostage
+  // Vous pouvez d├⌐finir pDegagement en dur ici ou l'avoir appris manuellement
+  // pAccostage.trsf.z = nHcouche1
+  //pAccostage.trsf={200,-150,nHcouche1,0,180,0}
+  // --- Ex├⌐cution ---
+  // Demarrage de l extrusion
+  movel(pChauffe,tBuse,vitextrusion)
+  waitEndMove()
+  // 1. Approche 
+  movel(pAccostage,tBuse,vitextrusion)
+  waitEndMove()
+
+
 
   // tCommande : reception des commandes
-  taskCreate sTaskCmd, 100, tCommande()
-  wait(taskStatus(sTaskCmd) == 1)
+  taskCreate sTaskCmd,100,tCommande()
+  wait(taskStatus(sTaskCmd)==1)
 
   // tRobot : execution des mouvements
-  taskCreate sTaskRobot, 100, tRobot()
-  wait(taskStatus(sTaskRobot) == 1)
+  taskCreate sTaskRobot,100,tRobot()
+  wait(taskStatus(sTaskRobot)==1)
 
   // Surveillance des overruns
   while true
-    if nPrevOvrPos != nOvrPos
-      logMsg("Overrun dans la tache " + sTaskPos)
-      nPrevOvrPos = nOvrPos
+    if nPrevOvrPos!=nOvrPos
+      logMsg("Overrun dans la tache "+sTaskPos)
+      nPrevOvrPos=nOvrPos
     endIf
     delay(0)
   endWhile
+
+
+  waitEndMove()
+
+  // 3. Repli
+  movel(pDegagement,tBuse,vitextrusion)
+  movel(pChauffe,tBuse,vitextrusion)
+
+  waitEndMove()
+
+
 end]]></Code>
   </Program>
 </Programs>

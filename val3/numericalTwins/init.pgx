@@ -1,56 +1,49 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
-  <Program name="init">
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2" >
+  <Program name="init" access="private" >
     <Code><![CDATA[begin
   // Noms des taches
-  sTaskPos   = "tPosition"
-  sTaskCmd   = "tCommande"
-  sTaskRobot = "tRobot"
+  sTaskPos="tPosition"
+  sTaskCmd="tCommande"
+  sTaskRobot="tRobot"
 
   // Overrun
-  bOvrPosition = false
-  nOvrPos      = 0
-  nPrevOvrPos  = 0
+  bOvrPosition=false
+  nOvrPos=0
+  nPrevOvrPos=0
 
   // Index trames emises
-  nFrameIndex = 0
+  nFrameIndex=0
 
   // Caracteres de protocole
-  nEol     = 10
-  nSof     = asc("{", 0)
-  nEof     = asc("}", 0)
-  nDivider = asc(";", 0)
+  nEol=10
+  nSof=asc("{",0)
+  nEof=asc("}",0)
+  nDivider=asc(";",0)
 
   // File circulaire
-  nQueueSize  = 5
-  nQueueWrite = 0
-  nQueueRead  = 0
-  nQueueCount = 0
+  nQueueSize=5
+  nQueueWrite=0
+  nQueueRead=0
+  nQueueCount=0
 
   // Flags
-  bFinish    = false
-  nLastIndex = 0
-
-  // Initialisation vitesse nominale
-  mNomSpeed.vel   = 50
-  mNomSpeed.accel = 50
-  mNomSpeed.dec   = 50
-  mNomSpeed.tmax  = 999
-  mNomSpeed.rmax  = 9999
+  bFinish=false
+  nLastIndex=0
 
   // Initialisation file avec repere world
-  pCmdQueue[0] = here(flange, world)
-  pCmdQueue[1] = here(flange, world)
-  pCmdQueue[2] = here(flange, world)
-  pCmdQueue[3] = here(flange, world)
-  pCmdQueue[4] = here(flange, world)
+  pCmdQueue[0]=here(flange,world)
+  pCmdQueue[1]=here(flange,world)
+  pCmdQueue[2]=here(flange,world)
+  pCmdQueue[3]=here(flange,world)
+  pCmdQueue[4]=here(flange,world)
 
   // Socket TCP
-  sioCtrl(sioSocket, "port",        2005)
-  sioCtrl(sioSocket, "target",      "192.168.99.6")
-  sioCtrl(sioSocket, "endOfString", nEol)
-  sioCtrl(sioSocket, "timeout",     -1)
-  sioCtrl(sioSocket, "nagle",       false)
+  sioCtrl(sioSocket,"port",2005)
+  sioCtrl(sioSocket,"target","192.168.99.6")
+  sioCtrl(sioSocket,"endOfString",nEol)
+  sioCtrl(sioSocket,"timeout",-1)
+  sioCtrl(sioSocket,"nagle",false)
 end]]></Code>
   </Program>
 </Programs>

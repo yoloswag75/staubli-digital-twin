@@ -26,9 +26,9 @@
 
       // Execution du mouvement selon le type
       if nTypeQueue[l_nIdx] == 0
-        movej(pCmdQueue[l_nIdx], flange, mNomSpeed)
+        movel(pCmdQueue[l_nIdx], tBuse, mNomSpeed)
       else
-        movel(pCmdQueue[l_nIdx], flange, mNomSpeed)
+        movel(pCmdQueue[l_nIdx], tBuse, mNomSpeed)
       endIf
       waitEndMove()
 

@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
-  <Program name="tCommande">
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2" >
+  <Program name="tCommande" access="private" >
     <Code><![CDATA[begin
   // Trame attendue depuis le PC :
   // {index;type;x;y;z;rx;ry;rz;vel}
@@ -9,35 +9,35 @@
 
   while true
     // Attente que la file ne soit pas pleine
-    wait(nQueueCount < nQueueSize)
+    wait(nQueueCount<nQueueSize)
 
     // Recherche debut de trame
     do
-      nNbChar = sioGet(sioSocket, nData)
-    until nNbChar > 0 and nData == nSof
+      nNbChar=sioGet(sioSocket,nData)
+    until nNbChar>0 and nData==nSof
 
     // Lecture des 9 champs
-    call getNum(nCmdIndex,                       nDivider)
-    call getNum(nCmdType,                        nDivider)
-    call getNum(pCmdQueue[nQueueWrite].trsf.x,   nDivider)
-    call getNum(pCmdQueue[nQueueWrite].trsf.y,   nDivider)
-    call getNum(pCmdQueue[nQueueWrite].trsf.z,   nDivider)
-    call getNum(pCmdQueue[nQueueWrite].trsf.rx,  nDivider)
-    call getNum(pCmdQueue[nQueueWrite].trsf.ry,  nDivider)
-    call getNum(pCmdQueue[nQueueWrite].trsf.rz,  nDivider)
-    call getNum(nCmdVel,                         nEof)
+    call getNum(nCmdIndex,nDivider)
+    call getNum(nCmdType,nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.x,nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.y,nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.z,nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.rx,nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.ry,nDivider)
+    call getNum(pCmdQueue[nQueueWrite].trsf.rz,nDivider)
+    call getNum(nCmdVel,nEof)
 
     // Ecriture dans la file
-    nTypeQueue[nQueueWrite]  = nCmdType
-    nIndexQueue[nQueueWrite] = nCmdIndex
-    nVelQueue[nQueueWrite]   = nCmdVel
+    nTypeQueue[nQueueWrite]=nCmdType
+    nIndexQueue[nQueueWrite]=nCmdIndex
+    nVelQueue[nQueueWrite]=nCmdVel
 
     // Avance le pointeur d ecriture (circulaire)
-    nQueueWrite = nQueueWrite + 1
-    if nQueueWrite >= nQueueSize
-      nQueueWrite = 0
+    nQueueWrite=nQueueWrite+1
+    if nQueueWrite>=nQueueSize
+      nQueueWrite=0
     endIf
-    nQueueCount = nQueueCount + 1
+    nQueueCount=nQueueCount+1
 
     delay(0)
   endWhile
