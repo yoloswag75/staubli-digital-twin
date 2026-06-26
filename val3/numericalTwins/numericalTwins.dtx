@@ -1,74 +1,137 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Database xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Data/2">
   <Datas>
-    <!-- Vitesse nominale pour movej/movel -->
-    <Data name="mNomSpeed" access="private" xsi:type="array" type="mdesc" size="1" />
-
-    <!-- Socket unique bidirectionnel -->
+    <Data name="bFinish" access="private" xsi:type="array" type="bool" size="1">
+    </Data>
+    <Data name="bOvrPosition" access="private" xsi:type="array" type="bool" size="1">
+    </Data>
+    <Data name="bResult" access="private" xsi:type="array" type="bool" size="1">
+      <Value key="0" value="true" />
+    </Data>
+    <Data name="fPlateau" access="private" xsi:type="array" type="frame" size="1">
+      <Value key="0" x="632.308207" y="706.981098" z="-559.699722" rx="-0.00630742" ry="-0.102848" rz="-0.154308" fatherId="world[0]" />
+    </Data>
+    <Data name="home" access="private" xsi:type="array" type="jointRx" size="1">
+      <Value key="0" j1="64" j2="-30" j3="143" j4="-103" j5="60" j6="116" />
+    </Data>
+    <Data name="jHere" access="private" xsi:type="array" type="jointRx" size="1">
+      <Value key="0" j1="45.383273" j2="1.666947" j3="107.278201" j4="-97.512292" j5="76.926774" j6="121.888458" />
+    </Data>
+    <Data name="jStart" access="private" xsi:type="array" type="jointRx" size="1">
+    </Data>
+    <Data name="mNomSpeed" access="private" xsi:type="array" type="mdesc" size="1">
+      <Value key="0" vel="50" />
+    </Data>
+    <Data name="vitextrusion" access="private" xsi:type="array" type="mdesc" size="1">
+      <Value key="0" rmax="500" tmax="17" leave="15" reach="15" />
+    </Data>
+    <Data name="nAckIndex" access="private" xsi:type="array" type="num" size="1">
+    </Data>
+    <Data name="nCmdIndex" access="private" xsi:type="array" type="num" size="1">
+      <Value key="0" value="4" />
+    </Data>
+    <Data name="nCmdType" access="private" xsi:type="array" type="num" size="1">
+      <Value key="0" value="1" />
+    </Data>
+    <Data name="nCmdVel" access="private" xsi:type="array" type="num" size="1">
+      <Value key="0" value="50" />
+    </Data>
+    <Data name="nData" access="private" xsi:type="array" type="num" size="1">
+      <Value key="0" value="10" />
+    </Data>
+    <Data name="nDivider" access="private" xsi:type="array" type="num" size="1">
+      <Value key="0" value="59" />
+    </Data>
+    <Data name="nEof" access="private" xsi:type="array" type="num" size="1">
+      <Value key="0" value="125" />
+    </Data>
+    <Data name="nEol" access="private" xsi:type="array" type="num" size="1">
+      <Value key="0" value="10" />
+    </Data>
+    <Data name="nFrameIndex" access="private" xsi:type="array" type="num" size="1">
+      <Value key="0" value="3553" />
+    </Data>
+    <Data name="nIndexQueue" access="private" xsi:type="array" type="num" size="5">
+      <Value key="0" value="1" />
+      <Value key="1" value="2" />
+      <Value key="2" value="3" />
+      <Value key="3" value="4" />
+    </Data>
+    <Data name="nLastIndex" access="private" xsi:type="array" type="num" size="1">
+    </Data>
+    <Data name="nNbChar" access="private" xsi:type="array" type="num" size="1">
+    </Data>
+    <Data name="nOvrPos" access="private" xsi:type="array" type="num" size="1">
+    </Data>
+    <Data name="nPrevOvrPos" access="private" xsi:type="array" type="num" size="1">
+    </Data>
+    <Data name="nQueueCount" access="private" xsi:type="array" type="num" size="1">
+    </Data>
+    <Data name="nQueueRead" access="private" xsi:type="array" type="num" size="1">
+    </Data>
+    <Data name="nQueueSize" access="private" xsi:type="array" type="num" size="1">
+      <Value key="0" value="5" />
+    </Data>
+    <Data name="nQueueWrite" access="private" xsi:type="array" type="num" size="1">
+    </Data>
+    <Data name="nSof" access="private" xsi:type="array" type="num" size="1">
+      <Value key="0" value="123" />
+    </Data>
+    <Data name="nTypeQueue" access="private" xsi:type="array" type="num" size="5">
+      <Value key="0" value="1" />
+      <Value key="1" value="1" />
+      <Value key="2" value="1" />
+      <Value key="3" value="1" />
+    </Data>
+    <Data name="nVelQueue" access="private" xsi:type="array" type="num" size="5">
+      <Value key="0" value="50" />
+      <Value key="1" value="50" />
+      <Value key="2" value="50" />
+      <Value key="3" value="50" />
+    </Data>
+    <Data name="pAccostage" access="private" xsi:type="array" type="pointRx" size="1">
+      <Value key="0" x="200" y="-150" z="5" rx="-180" ry="7.016478e-15" rz="-180" fatherId="fPlateau[0]" />
+    </Data>
+    <Data name="pChauffe" access="private" xsi:type="array" type="pointRx" size="1">
+      <Value key="0" x="-200" z="200" ry="180" fatherId="fPlateau[0]" />
+    </Data>
+    <Data name="pCmdQueue" access="private" xsi:type="array" type="pointRx" size="5">
+      <Value key="0" x="371.256502" y="762.70159" z="186.0845966" rx="89.692992" ry="69.84956" rz="-90.0731633" shoulder="lefty" elbow="epositive" wrist="wpositive" fatherId="world[0]" />
+      <Value key="1" x="371.256502" y="762.70159" z="186.0845966" rx="89.692992" ry="69.84956" rz="-90.0731633" shoulder="lefty" elbow="epositive" wrist="wpositive" fatherId="world[0]" />
+      <Value key="2" x="371.256502" y="762.70159" z="186.0845966" rx="89.692992" ry="69.84956" rz="-90.0731633" shoulder="lefty" elbow="epositive" wrist="wpositive" fatherId="world[0]" />
+      <Value key="3" x="371.256502" y="762.70159" z="186.0845966" rx="89.692992" ry="69.84956" rz="-90.0731633" shoulder="lefty" elbow="epositive" wrist="wpositive" fatherId="world[0]" />
+      <Value key="4" x="371.256502" y="762.70159" z="186.0845966" rx="89.692992" ry="69.84956" rz="-90.0731633" shoulder="lefty" elbow="epositive" wrist="wpositive" fatherId="world[0]" />
+    </Data>
+    <Data name="pDegagement" access="private" xsi:type="array" type="pointRx" size="1">
+      <Value key="0" z="200" ry="180" fatherId="fPlateau[0]" />
+    </Data>
+    <Data name="pHere" access="private" xsi:type="array" type="pointRx" size="1">
+      <Value key="0" x="832.0401931" y="692.000932864" z="529.509333" rx="84.591408" ry="60.0803316" rz="-73.577687" shoulder="lefty" elbow="epositive" wrist="wpositive" fatherId="world[0]" />
+    </Data>
     <Data name="sioSocket" access="private" xsi:type="array" type="sio" size="1">
       <Value key="0" link="Socket\toto" />
     </Data>
-
-    <!-- Noms des taches -->
-    <Data name="sTaskPos"     access="private" xsi:type="array" type="string" size="1" />
-    <Data name="sTaskCmd"     access="private" xsi:type="array" type="string" size="1" />
-    <Data name="sTaskRobot"   access="private" xsi:type="array" type="string" size="1" />
-
-    <!-- Envoi position (tPosition) -->
-    <Data name="jHere"        access="private" xsi:type="array" type="jointRx" size="1" />
-    <Data name="sData"        access="private" xsi:type="array" type="string"  size="1" />
-    <Data name="nFrameIndex"  access="private" xsi:type="array" type="num"     size="1" />
-    <Data name="nEol"         access="private" xsi:type="array" type="num"     size="1" />
-
-    <!-- Overrun de la tache synchrone -->
-    <Data name="bOvrPosition" access="private" xsi:type="array" type="bool"   size="1" />
-    <Data name="nOvrPos"      access="private" xsi:type="array" type="num"    size="1" />
-    <Data name="nPrevOvrPos"  access="private" xsi:type="array" type="num"    size="1" />
-
-    <!-- Protocole socket -->
-    <Data name="nSof"         access="private" xsi:type="array" type="num"     size="1" />
-    <Data name="nEof"         access="private" xsi:type="array" type="num"     size="1" />
-    <Data name="nDivider"     access="private" xsi:type="array" type="num"     size="1" />
-    <Data name="nNbChar"      access="private" xsi:type="array" type="num"     size="1" />
-    <Data name="nData"        access="private" xsi:type="array" type="num"     size="1" />
-    <Data name="sDataIn"      access="private" xsi:type="array" type="string"  size="1" />
-    <Data name="bResult"      access="private" xsi:type="array" type="bool"    size="1" />
-
-    <!-- File de commandes (taille 5) -->
-    <Data name="pCmdQueue"    access="private" xsi:type="array" type="pointRx" size="5">
-      <Value key="0" fatherId="world[0]" />
-      <Value key="1" fatherId="world[0]" />
-      <Value key="2" fatherId="world[0]" />
-      <Value key="3" fatherId="world[0]" />
-      <Value key="4" fatherId="world[0]" />
+    <Data name="sAck" access="private" xsi:type="array" type="string" size="1">
     </Data>
-    <Data name="nTypeQueue"   access="private" xsi:type="array" type="num"     size="5" />
-    <!-- type : 0=movej, 1=movel -->
-    <Data name="nIndexQueue"  access="private" xsi:type="array" type="num"     size="5" />
-    <!-- index de chaque point dans la file -->
-    <Data name="nVelQueue"    access="private" xsi:type="array" type="num"     size="5" />
-    <!-- vitesse mm/s de chaque point -->
-
-    <!-- Pointeurs de file (producteur/consommateur) -->
-    <Data name="nQueueWrite"  access="private" xsi:type="array" type="num"     size="1" />
-    <!-- index d ecriture (tCommande) -->
-    <Data name="nQueueRead"   access="private" xsi:type="array" type="num"     size="1" />
-    <!-- index de lecture (tRobot) -->
-    <Data name="nQueueCount"  access="private" xsi:type="array" type="num"     size="1" />
-    <!-- nombre de points dans la file -->
-    <Data name="nQueueSize"   access="private" xsi:type="array" type="num"     size="1" />
-    <!-- taille max de la file (5) -->
-
-    <!-- Variables de parsing -->
-    <Data name="nCmdIndex"    access="private" xsi:type="array" type="num"     size="1" />
-    <Data name="nCmdType"     access="private" xsi:type="array" type="num"     size="1" />
-    <Data name="nCmdVel"      access="private" xsi:type="array" type="num"     size="1" />
-    <Data name="nLastIndex"   access="private" xsi:type="array" type="num"     size="1" />
-    <Data name="bFinish"      access="private" xsi:type="array" type="bool"    size="1" />
-    <Data name="jStart"       access="private" xsi:type="array" type="jointRx" size="1" />
-
-    <!-- ACK envoye par tRobot apres execution -->
-    <Data name="sAck"         access="private" xsi:type="array" type="string"  size="1" />
-    <Data name="nAckIndex"    access="private" xsi:type="array" type="num"     size="1" />
+    <Data name="sData" access="private" xsi:type="array" type="string" size="1">
+      <Value key="0" value="{3553;    45.383;     1.667;   107.278;   -97.512;    76.927;   121.888;832.04 ;692.001;529.509;84.591;60.08 ;-73.578}" />
+    </Data>
+    <Data name="sDataIn" access="private" xsi:type="array" type="string" size="1">
+    </Data>
+    <Data name="sTaskCmd" access="private" xsi:type="array" type="string" size="1">
+      <Value key="0" value="tCommande" />
+    </Data>
+    <Data name="sTaskPos" access="private" xsi:type="array" type="string" size="1">
+      <Value key="0" value="tPosition" />
+    </Data>
+    <Data name="sTaskRobot" access="private" xsi:type="array" type="string" size="1">
+      <Value key="0" value="tRobot" />
+    </Data>
+    <Data name="tBuse" access="private" xsi:type="array" type="tool" size="1">
+      <Value key="0" x="551" y="-30" z="75" ry="90" rz="-20" fatherId="flange[0]" ioLink="valve1" />
+    </Data>
+    <Data name="tPalpage" access="private" xsi:type="array" type="tool" size="1">
+      <Value key="0" x="655.7" y="-30" z="75" ry="90" rz="-20" fatherId="flange[0]" />
+    </Data>
   </Datas>
 </Database>

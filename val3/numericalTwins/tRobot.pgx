@@ -18,14 +18,19 @@
     if nIndexQueue[l_nIdx] == nLastIndex + 1
 
       // Configuration vitesse pour ce point
-      setSpeed(mNomSpeed, nVelQueue[l_nIdx])
+      mNomSpeed.vel = nVelQueue[l_nIdx]
+      pCmdQueue[l_nIdx].config.shoulder = lefty
+      pCmdQueue[l_nIdx].config.wrist    = wpositive
+      pCmdQueue[l_nIdx].config.elbow    = epositive
+      logMsg("Point: x=" + toString(".1", pCmdQueue[l_nIdx].trsf.x) + " y=" + toString(".1", pCmdQueue[l_nIdx].trsf.y) + " z=" + toString(".1", pCmdQueue[l_nIdx].trsf.z))
 
       // Execution du mouvement selon le type
       if nTypeQueue[l_nIdx] == 0
-        movej(pCmdQueue[l_nIdx], flange, mNomSpeed)
+        movel(pCmdQueue[l_nIdx], tBuse, mNomSpeed)
       else
-        movel(pCmdQueue[l_nIdx], flange, mNomSpeed)
+        movel(pCmdQueue[l_nIdx], tBuse, mNomSpeed)
       endIf
+      waitEndMove()
 
       nLastIndex = nIndexQueue[l_nIdx]
 
@@ -44,7 +49,10 @@
     endIf
 
     // Avance le pointeur de lecture
-    nQueueRead  = (nQueueRead + 1) mod nQueueSize
+    nQueueRead = nQueueRead + 1
+    if nQueueRead >= nQueueSize
+      nQueueRead = 0
+    endIf
     nQueueCount = nQueueCount - 1
 
     delay(0)
