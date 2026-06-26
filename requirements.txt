@@ -2,7 +2,11 @@
 # (hors ROS2 et bibliothèque standard — voir notice d'installation section 5)
 
 pyyaml>=6.0
-numpy>=1.21
+
+# NumPy < 2.0 : la version 2.x est incompatible avec le scipy installé
+# par apt (dépendance système ROS2), qui provoque un UserWarning
+# au démarrage et des comportements imprévisibles avec roboticstoolbox.
+numpy>=1.21,<2.0
 
 # Cinématique inverse pour robot_simulator.py
 # Optionnel : sans ces deux paquets, le simulateur fonctionne
