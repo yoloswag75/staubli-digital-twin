@@ -13,7 +13,7 @@
   <link name="world"/>
   <joint name="world_to_base" type="fixed">
     <parent link="world"/><child link="base_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 3.14159"/>
   </joint>
 
   <!-- ═══════════════════════════════════════════════════════
@@ -201,5 +201,72 @@
     <origin xyz="0 0 0.1" rpy="0 0 0"/>
   </joint>
   <link name="flange"/>
+<!-- CELLULE -->
+  <material name="cell_grey"><color rgba="0.5 0.5 0.5 1.0"/></material>
+  <material name="cell_blue"><color rgba="0.2 0.4 0.8 1.0"/></material>
+  <material name="cell_yellow"><color rgba="0.9 0.8 0.1 1.0"/></material>
 
+  <!-- CONTROLEUR CS8 -->
+  <link name="controleur">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://staubli_description/meshes/visual/cell/controleur.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="cell_grey"/>
+    </visual>
+  </link>
+  <joint name="world_to_controleur" type="fixed">
+    <parent link="world"/>
+    <child link="controleur"/>
+    <origin xyz="0.470 4.040 0.0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- SILO -->
+  <link name="silo">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://staubli_description/meshes/visual/cell/silo.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="cell_blue"/>
+    </visual>
+  </link>
+  <joint name="world_to_silo" type="fixed">
+    <parent link="world"/>
+    <child link="silo"/>
+    <origin xyz="0.700 1.000 0.0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- AERATION -->
+  <link name="aeration">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://staubli_description/meshes/visual/cell/aeration.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="cell_yellow"/>
+    </visual>
+  </link>
+  <joint name="world_to_aeration" type="fixed">
+    <parent link="world"/>
+    <child link="aeration"/>
+    <origin xyz="0.941 -0.725 0.0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- TETE EXTRUSION -->
+  <link name="tete_extrusion">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://staubli_description/meshes/visual/tete_extrusion.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="cell_grey"/>
+    </visual>
+  </link>
+  <joint name="flange_to_tete" type="fixed">
+    <parent link="flange"/>
+    <child link="tete_extrusion"/>
+    <origin xyz="0 0 -0.115" rpy="3.14159 3.14159 -2.0071"/>
+  </joint>
 </robot>
