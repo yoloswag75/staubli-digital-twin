@@ -1,0 +1,4 @@
+# GetDataDir.srv
+# Demande le repertoire de sauvegarde des donnees au digital twin
+---
+string data_dir

@@ -58,6 +58,7 @@ class DtGui:
         self._dt_start    = time.time()
         self._ros_node    = None
         self._ip_pub      = None
+        self._data_dir    = str(pathlib.Path.home() / "Desktop")
 
         root.title("Staubli Digital Twin")
         root.configure(bg=BG)
@@ -87,6 +88,17 @@ class DtGui:
 
                 node.create_service(GetRobotIp, "/staubli/get_robot_ip",
                                     handle_get_ip)
+
+                from staubli_msgs.srv import GetDataDir
+
+                def handle_get_data_dir(request, response):
+                    response.data_dir = self._data_dir
+                    node.get_logger().info(
+                        f"Service GetDataDir -> {response.data_dir}")
+                    return response
+
+                node.create_service(GetDataDir, "/staubli/get_data_dir",
+                                    handle_get_data_dir)
 
                 self.root.after(0, self.status_bar.set,
                                 "ROS2 OK - service /staubli/get_robot_ip actif")
@@ -202,15 +214,25 @@ class DtGui:
         actions.grid(row=6, column=0, columnspan=2, sticky="ew", padx=10, pady=6)
 
         btn_cfg = [
-            ("Lancer RViz",       "Green.TButton", self._start_rviz),
-            ("Fermer RViz",       "Red.TButton",   self._stop_rviz),
-            ("Charger programme", "TButton",        self._start_dtx_gui),
-            ("Repertoire data",   "TButton",        self._open_data_dir),
+            ("Lancer RViz",        "Green.TButton", self._start_rviz),
+            ("Fermer RViz",        "Red.TButton",   self._stop_rviz),
+            ("Charger programme",  "TButton",        self._start_dtx_gui),
+            ("Ouvrir repertoire",  "TButton",        self._open_data_dir),
         ]
         for i, (label, style, cmd) in enumerate(btn_cfg):
             ttk.Button(actions, text=label, style=style,
                        command=cmd, width=20).grid(
                 row=i//2, column=i%2, padx=6, pady=4, sticky="ew")
+
+        # Repertoire de sauvegarde
+        f_dir = ttk.Frame(actions)
+        f_dir.grid(row=2, column=0, columnspan=2, sticky="w", padx=6, pady=4)
+        ttk.Label(f_dir, text="Repertoire :").pack(side="left")
+        self.data_dir_var = tk.StringVar(value=str(pathlib.Path.home() / "Desktop"))
+        ttk.Label(f_dir, textvariable=self.data_dir_var,
+                  style="Grey.TLabel", width=25).pack(side="left", padx=4)
+        ttk.Button(f_dir, text="Changer",
+                   command=self._change_data_dir).pack(side="left")
 
         ttk.Separator(self.root, orient="horizontal").grid(
             row=7, column=0, columnspan=2, sticky="ew", padx=10)
@@ -314,8 +336,20 @@ class DtGui:
         self._traj_start = time.time()
         self.status_bar.set("DTX Player lance")
 
+    def _change_data_dir(self):
+        from tkinter import filedialog
+        new_dir = filedialog.askdirectory(
+            title="Choisir le repertoire de sauvegarde",
+            initialdir=self._data_dir,
+            parent=self.root
+        )
+        if new_dir:
+            self._data_dir = new_dir
+            self.data_dir_var.set(new_dir)
+            self.status_bar.set(f"Repertoire : {new_dir}")
+
     def _open_data_dir(self):
-        data_path = pathlib.Path.home() / "Desktop"
+        data_path = pathlib.Path(self._data_dir)
         subprocess.Popen(["xdg-open", str(data_path)])
 
     def _start_monitor(self):

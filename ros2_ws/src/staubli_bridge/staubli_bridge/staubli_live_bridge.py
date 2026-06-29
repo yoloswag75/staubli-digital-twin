@@ -12,7 +12,7 @@ Flux de données :
 
 import rclpy
 from rclpy.node import Node
-from staubli_msgs.srv import GetRobotIp
+from staubli_msgs.srv import GetRobotIp, GetDataDir
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import PoseStamped
 import socket
@@ -70,7 +70,7 @@ class StaubliBridgeROS2(Node):
 
         # ── CSV ───────────────────────────────────────────────
         home_dir  = os.path.expanduser('~')
-        desktop   = os.path.join(home_dir, 'Desktop')
+        desktop   = self.data_dir if hasattr(self, "data_dir") else os.path.join(home_dir, "Desktop")
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.csv_filename = os.path.join(desktop, f"robot_live_data_{timestamp}.csv")
         self.get_logger().info(f"📁 CSV : {self.csv_filename}")
@@ -84,6 +84,18 @@ class StaubliBridgeROS2(Node):
             self.get_logger().info(f"IP robot depuis config.yaml : {robot_ip}")
         self.robot_ip = robot_ip
 
+        # ── Repertoire de sauvegarde depuis dt_gui ────────────
+        data_dir = self._get_data_dir_from_dt()
+        if not data_dir:
+            data_dir = os.path.join(os.path.expanduser("~"), "Desktop")
+        self.data_dir = data_dir
+        self.get_logger().info(f"Repertoire CSV : {self.data_dir}")
+
+        # ── CSV ───────────────────────────────────────────────
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        self.csv_filename = os.path.join(self.data_dir, f"robot_live_data_{timestamp}.csv")
+        self.get_logger().info(f"CSV : {self.csv_filename}")
+
         # ── Socket TCP ────────────────────────────────────────
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -95,6 +107,18 @@ class StaubliBridgeROS2(Node):
 
         self.recv_thread = threading.Thread(target=self.receive_loop, daemon=True)
         self.recv_thread.start()
+
+    def _get_data_dir_from_dt(self):
+        """Appelle le service dt_gui pour obtenir le repertoire de sauvegarde."""
+        client = self.create_client(GetDataDir, "/staubli/get_data_dir")
+        if client.wait_for_service(timeout_sec=3.0):
+            req = GetDataDir.Request()
+            future = client.call_async(req)
+            rclpy.spin_until_future_complete(self, future, timeout_sec=3.0)
+            if future.result():
+                return future.result().data_dir
+        self.get_logger().warn("Service GetDataDir non disponible")
+        return None
 
     def _get_robot_ip_from_dt(self):
         """Appelle le service dt_gui pour obtenir l'IP du robot."""
