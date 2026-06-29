@@ -2,7 +2,7 @@
 <package format="3">
   <name>staubli_msgs</name>
   <version>0.0.1</version>
-  <description>Messages custom pour le jumeau numérique Stäubli</description>
+  <description>Messages et services custom pour le jumeau numerique Staubli</description>
   <maintainer email="todo@mail.com">todo</maintainer>
   <license>MIT</license>
 
@@ -11,8 +11,7 @@
 
   <depend>std_msgs</depend>
 
-  <!-- Décommenter en Phase 4 quand les .msg seront créés -->
-  <!-- <member_of_group>rosidl_interface_packages</member_of_group> -->
+  <member_of_group>rosidl_interface_packages</member_of_group>
 
   <export>
     <build_type>ament_cmake</build_type>

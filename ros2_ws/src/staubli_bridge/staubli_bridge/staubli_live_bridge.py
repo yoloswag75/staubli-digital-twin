@@ -12,6 +12,7 @@ Flux de données :
 
 import rclpy
 from rclpy.node import Node
+from staubli_msgs.srv import GetRobotIp
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import PoseStamped
 import socket
@@ -74,6 +75,15 @@ class StaubliBridgeROS2(Node):
         self.csv_filename = os.path.join(desktop, f"robot_live_data_{timestamp}.csv")
         self.get_logger().info(f"📁 CSV : {self.csv_filename}")
 
+        # ── IP robot depuis dt_gui (service) ─────────────────
+        robot_ip = self._get_robot_ip_from_dt()
+        if robot_ip:
+            self.get_logger().info(f"IP robot depuis dt_gui : {robot_ip}")
+        else:
+            robot_ip = CONFIG.get("robot", {}).get("robot_ip", "192.168.99.25")
+            self.get_logger().info(f"IP robot depuis config.yaml : {robot_ip}")
+        self.robot_ip = robot_ip
+
         # ── Socket TCP ────────────────────────────────────────
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -85,6 +95,19 @@ class StaubliBridgeROS2(Node):
 
         self.recv_thread = threading.Thread(target=self.receive_loop, daemon=True)
         self.recv_thread.start()
+
+    def _get_robot_ip_from_dt(self):
+        """Appelle le service dt_gui pour obtenir l'IP du robot."""
+        client = self.create_client(GetRobotIp, "/staubli/get_robot_ip")
+        self.get_logger().info("Recherche service /staubli/get_robot_ip...")
+        if client.wait_for_service(timeout_sec=3.0):
+            req = GetRobotIp.Request()
+            future = client.call_async(req)
+            rclpy.spin_until_future_complete(self, future, timeout_sec=3.0)
+            if future.result():
+                return future.result().robot_ip
+        self.get_logger().warn("Service non disponible - utilisation config.yaml")
+        return None
 
     # ──────────────────────────────────────────────────────────
     # RÉCEPTION : Robot → PC

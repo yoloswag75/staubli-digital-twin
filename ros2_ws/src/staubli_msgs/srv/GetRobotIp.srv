@@ -1,0 +1,4 @@
+# GetRobotIp.srv
+# Demande l'IP du robot au digital twin
+---
+string robot_ip
