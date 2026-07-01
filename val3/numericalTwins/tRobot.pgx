@@ -5,7 +5,6 @@
       <Local name="l_nIdx" type="num" xsi:type="array" size="1" />
     </Locals>
     <Code><![CDATA[begin
-  resetMotion(jStart)
 
   while !bFinish
     // Attente qu il y ait au moins un point dans la file

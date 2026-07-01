@@ -216,7 +216,8 @@ class DtGui:
         btn_cfg = [
             ("Lancer RViz",        "Green.TButton", self._start_rviz),
             ("Fermer RViz",        "Red.TButton",   self._stop_rviz),
-            ("Charger programme",  "TButton",        self._start_dtx_gui),
+            ("Charger programme",  "Green.TButton", self._start_dtx_gui),
+            ("Fermer programme",   "Red.TButton",   self._stop_dtx_gui),
             ("Ouvrir repertoire",  "TButton",        self._open_data_dir),
         ]
         for i, (label, style, cmd) in enumerate(btn_cfg):
@@ -333,7 +334,6 @@ class DtGui:
             return
         self.procs["dtx"] = subprocess.Popen(
             ["python3", str(dtx_path)], preexec_fn=os.setsid)
-        self._traj_start = time.time()
         self.status_bar.set("DTX Player lance")
 
     def _change_data_dir(self):
@@ -347,6 +347,31 @@ class DtGui:
             self._data_dir = new_dir
             self.data_dir_var.set(new_dir)
             self.status_bar.set(f"Repertoire : {new_dir}")
+
+    def _stop_dtx_gui(self):
+        if "dtx" not in self.procs or self.procs["dtx"].poll() is not None:
+            self.status_bar.set("Aucun programme en cours")
+            return
+        if self._traj_start is not None:
+            if not messagebox.askyesno(
+                "Attention",
+                "Une trajectoire est en cours !\n"
+                "Fermer le programme peut laisser le robot en mouvement.\n\n"
+                "Confirmer la fermeture ?"
+            ):
+                return
+        import signal
+        try:
+            os.killpg(os.getpgid(self.procs["dtx"].pid), signal.SIGKILL)
+        except Exception:
+            try:
+                self.procs["dtx"].kill()
+            except Exception:
+                pass
+        del self.procs["dtx"]
+        self._traj_start = None
+        self.traj_time_var.set("--:--:--")
+        self.status_bar.set("Programme ferme")
 
     def _open_data_dir(self):
         data_path = pathlib.Path(self._data_dir)
@@ -376,12 +401,12 @@ class DtGui:
     def on_close(self):
         self.running = False
         import signal
-        for name, p in self.procs.items():
+        for name, p in list(self.procs.items()):
             try:
-                os.killpg(os.getpgid(p.pid), signal.SIGTERM)
+                os.killpg(os.getpgid(p.pid), signal.SIGKILL)
             except Exception:
                 try:
-                    p.terminate()
+                    p.kill()
                 except Exception:
                     pass
         self.root.destroy()
